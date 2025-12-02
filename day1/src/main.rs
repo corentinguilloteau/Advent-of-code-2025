@@ -1,3 +1,4 @@
+#[derive(PartialEq)]
 pub enum Direction {
     Left,
     Right,
@@ -13,42 +14,53 @@ impl Direction {
     }
 }
 
-pub struct Counter {
+pub struct Dial {
     count: i32,
 }
 
-impl Counter {
+impl Dial {
     pub fn new(inital_count: i32) -> Self {
-        Counter {
+        Dial {
             count: inital_count,
         }
     }
 
-    pub fn command(&mut self, direction: Direction, steps: i32) {
+    pub fn command(&mut self, direction: Direction, steps: u32) -> u32 {
+        let mut at_0_count = u32::div_euclid(steps, 100);
+        let remaining_steps = steps % 100;
+        let previous_count = self.count;
+
         match direction {
-            Direction::Left => self.count = i32::wrapping_sub(self.count, steps),
-            Direction::Right => self.count = i32::wrapping_add(self.count, steps),
+            Direction::Left => self.count -= remaining_steps as i32,
+            Direction::Right => self.count += remaining_steps as i32,
         };
 
-        self.count %= 100;
+        at_0_count += if previous_count > 0 && self.count <= 0 || self.count >= 100 {
+            1
+        } else {
+            0
+        };
+        self.count = i32::rem_euclid(self.count, 100);
+
+        return at_0_count;
     }
 }
 
 fn main() {
-    let mut counter = Counter::new(50);
-    let mut at_0 = 0;
+    let mut counter = Dial::new(50);
+    let mut at_0_step1 = 0;
+    let mut at_0_step2 = 0;
 
     for line in std::fs::read_to_string("input").unwrap().lines() {
-        let dir = &line[0..1];
-        let steps = &line[1..];
-        let steps: i32 = steps.parse().unwrap();
+        let direction = Direction::from_str(&line[0..1]);
+        let steps: u32 = line[1..].parse().unwrap();
 
-        counter.command(Direction::from_str(dir), steps);
-
+        at_0_step2 += counter.command(direction, steps);
         if counter.count == 0 {
-            at_0 += 1;
+            at_0_step1 += 1;
         }
     }
 
-    println!("Final count: {}", at_0);
+    println!("Final count step 1: {}", at_0_step1);
+    println!("Final count step 2: {}", at_0_step2);
 }
