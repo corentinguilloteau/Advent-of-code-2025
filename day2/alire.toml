@@ -8,4 +8,4 @@ licenses = "MIT"
 website = ""
 tags = []
 
-executables = ["day2"]
+executables = ["main"]
