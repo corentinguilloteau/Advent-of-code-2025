@@ -1,13 +1,11 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Interfaces; use Interfaces;
 
 package Day3 is
 
-   function Process return Positive;
+   function Process (Override : Boolean) return Unsigned_64;
 
 private
    subtype Joltage is Positive range 1 .. 9;
    type Battery_Bank is array (Positive range <>) of Joltage;
-
-   function Read_Line (File : File_Type) return Battery_Bank;
 
 end Day3;
